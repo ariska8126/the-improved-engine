@@ -32,8 +32,18 @@ public class PasswordResetServiceImplement implements PasswordResetUserInterface
     }
 
     @Override
-    public Users findUIID(String uiid) {
+    public int findUIID(String uiid) {
         return repository.findUIID(uiid);
+    }
+
+    @Override
+    public int ifExists(String email) {
+        return repository.ifExists(email);
+    }
+
+    @Override
+    public Users findByUIID(String uiid) {
+        return repository.findByUIID(uiid);
     }
     
 }

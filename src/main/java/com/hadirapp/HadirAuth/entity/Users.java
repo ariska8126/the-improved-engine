@@ -92,6 +92,24 @@ public class Users implements Serializable {
     public Users(String userId) {
         this.userId = userId;
     }
+    
+    //for request reset password 
+
+    public Users(String userId, String userFullname, String userEmail, String userPassword, 
+            String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto,
+            Role roleId, Division divisionId) {
+        this.userId = userId;
+        this.userFullname = userFullname;
+        this.userEmail = userEmail;
+        this.userPassword = userPassword;
+        this.userActive = userActive;
+        this.userUnixcodeValue = userUnixcodeValue;
+        this.userUnixcodeDate = userUnixcodeDate;
+        this.userPhoto = userPhoto;
+        this.roleId = roleId;
+        this.divisionId = divisionId;
+    }
+    
 
     public Users(String userId, String userFullname, String userEmail, String userPassword, String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto) {
         this.userId = userId;
