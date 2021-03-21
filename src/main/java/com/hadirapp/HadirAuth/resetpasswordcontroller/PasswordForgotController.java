@@ -149,7 +149,7 @@ public class PasswordForgotController {
 
         }
 
-        return "succes";
+//        return "succes";
     }
 
     @PostMapping("/api/auth/resetpassword/savenewpassword")

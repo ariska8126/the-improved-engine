@@ -103,6 +103,18 @@
             <version>1.18.18</version>
             <type>jar</type>
         </dependency>
+        
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
