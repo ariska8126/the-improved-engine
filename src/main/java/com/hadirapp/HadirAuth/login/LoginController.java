@@ -46,7 +46,7 @@ public class LoginController {
     }
     
     @RequestMapping(value="/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(
+    public String createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception{
         
         System.out.println("running login controller");
@@ -73,6 +73,7 @@ public class LoginController {
         String email = users.getUserEmail();
         int roleId = users.getRoleId().getRoleId();
         String roleName = users.getRoleId().getRoleName();
+        String name = users.getUserFullname();
         
         System.out.println("id: "+id);
         System.out.println("email: "+email);
@@ -81,19 +82,19 @@ public class LoginController {
         
         JSONArray data = new JSONArray();
         JSONObject role = new JSONObject();
-        role.put("roleID", roleId);
-        role.put("roleName", roleName);
         
         JSONObject dataContent = new JSONObject();
+        dataContent.put("name",name);
         dataContent.put("email", email);
         dataContent.put("id", id);
-        dataContent.put("role", role);
+        dataContent.put("id_role", roleId);
+        dataContent.put("name_role",roleName);
         
-//        data.add(dataContent);
         System.out.println("data json: "+dataContent);
-        
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        dataContent.put("token", jwt);
+        //return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return dataContent.toJSONString();
     }
     
 }
