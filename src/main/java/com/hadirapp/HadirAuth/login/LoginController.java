@@ -6,8 +6,10 @@
 package com.hadirapp.HadirAuth.login;
 
 import com.hadirapp.HadirAuth.entity.Users;
+import com.hadirapp.HadirAuth.jwtfilter.JwtRequestFilter;
 import com.hadirapp.HadirAuth.jwtutil.JwtUtil;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+import com.hadirapp.HadirAuth.resetpasswordrepository.UserRepository;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,13 @@ public class LoginController {
     private JwtUtil jwtTokenUtil;
     
     @Autowired
+    JwtRequestFilter jwtRequestFilter;
+    
+    @Autowired
     private PasswordResetServiceImplement passwordResetServiceImplement;
+    
+    @Autowired
+    UserRepository userRepository;
     
     @RequestMapping("/hello")
     public String hello(){
@@ -59,6 +67,8 @@ public class LoginController {
             throw new Exception("incorect username or password"+e);
         }
         
+        
+        
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
         
@@ -68,6 +78,8 @@ public class LoginController {
         
         Users users = new Users();
         users = passwordResetServiceImplement.findByEmail(uname);
+        String userToken = users.getUserToken();
+        
         
         String id = users.getUserId();
         String email = users.getUserEmail();
@@ -90,9 +102,15 @@ public class LoginController {
         dataContent.put("id_role", roleId);
         dataContent.put("name_role",roleName);
         
+        
+        
         System.out.println("data json: "+dataContent);
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
         dataContent.put("token", jwt);
+        users.setUserToken(jwt);
+        System.out.println("token baru: "+jwt);
+        userRepository.save(users);
+//        userRepository.updateToken(jwt, id);
         //return ResponseEntity.ok(new AuthenticationResponse(jwt));
         return dataContent.toJSONString();
     }
