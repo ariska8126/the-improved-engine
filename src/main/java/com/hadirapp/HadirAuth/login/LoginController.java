@@ -8,6 +8,7 @@ package com.hadirapp.HadirAuth.login;
 import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.jwtutil.JwtUtil;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+import java.util.Date;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,11 @@ public class LoginController {
 //        data.add(dataContent);
         System.out.println("data json: "+dataContent);
         
+        
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
+        
+        Date exp = jwtTokenUtil.extractExpiration(jwt);
+        System.out.println("expiration date: "+exp);
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
     
