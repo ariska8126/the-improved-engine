@@ -10,8 +10,12 @@
     </parent>
     <groupId>com.hadirapp</groupId>
     <artifactId>HadirAuth</artifactId>
-    <packaging>jar</packaging>
+    <!--<packaging>jar</packaging>-->
     <version>0.0.1-SNAPSHOT</version>
+    
+    <!-- build war -->
+    <packaging>war</packaging>
+    
     <name>HadirAuth</name>
     <description>the improve engine</description>
     <properties>
@@ -74,6 +78,13 @@
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
             <type>jar</type>
+        </dependency>
+        
+        <!-- Disable the embedded Tomcat in Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
