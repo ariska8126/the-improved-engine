@@ -17,5 +17,9 @@ public interface PasswordResetUserInterface {
     
     void save(Users users);
     
-    public Users findUIID(String uiid);
+    public Users findByUIID(String uiid);
+    
+    public int ifExists(String email);
+    
+    public int findUIID(String uiid);
 }

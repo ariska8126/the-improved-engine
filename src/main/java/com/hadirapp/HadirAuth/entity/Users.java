@@ -43,6 +43,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Users.findByUserUnixcodeDate", query = "SELECT u FROM Users u WHERE u.userUnixcodeDate = :userUnixcodeDate")})
 public class Users implements Serializable {
 
+    @Column(name = "user_token")
+    private String userToken;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -92,6 +95,24 @@ public class Users implements Serializable {
     public Users(String userId) {
         this.userId = userId;
     }
+    
+    //for request reset password 
+
+    public Users(String userId, String userFullname, String userEmail, String userPassword, 
+            String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto,
+            Role roleId, Division divisionId) {
+        this.userId = userId;
+        this.userFullname = userFullname;
+        this.userEmail = userEmail;
+        this.userPassword = userPassword;
+        this.userActive = userActive;
+        this.userUnixcodeValue = userUnixcodeValue;
+        this.userUnixcodeDate = userUnixcodeDate;
+        this.userPhoto = userPhoto;
+        this.roleId = roleId;
+        this.divisionId = divisionId;
+    }
+    
 
     public Users(String userId, String userFullname, String userEmail, String userPassword, String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto) {
         this.userId = userId;
@@ -243,6 +264,14 @@ public class Users implements Serializable {
     @Override
     public String toString() {
         return "com.hadirapp.HadirAuth.entity.Users[ userId=" + userId + " ]";
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
     
 }
