@@ -43,6 +43,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Users.findByUserUnixcodeDate", query = "SELECT u FROM Users u WHERE u.userUnixcodeDate = :userUnixcodeDate")})
 public class Users implements Serializable {
 
+    @Column(name = "user_token")
+    private String userToken;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -261,6 +264,14 @@ public class Users implements Serializable {
     @Override
     public String toString() {
         return "com.hadirapp.HadirAuth.entity.Users[ userId=" + userId + " ]";
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
     
 }

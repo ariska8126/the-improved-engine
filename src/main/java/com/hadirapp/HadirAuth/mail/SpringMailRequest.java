@@ -5,13 +5,11 @@
  */
 package com.hadirapp.HadirAuth.mail;
 
-import lombok.Data;
 
 /**
  *
  * @author herli
  */
-@Data
 public class SpringMailRequest {
     
     private String name;
