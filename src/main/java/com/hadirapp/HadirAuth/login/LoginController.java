@@ -57,6 +57,11 @@ public class LoginController {
     public String createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception{
         
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        
+        JSONObject dataContent = new JSONObject();
+        
         System.out.println("running login controller");
         try{
             authenticationManager.authenticate(
@@ -64,7 +69,11 @@ public class LoginController {
                     authenticationRequest.getPassword())
             );
         }catch(BadCredentialsException e){
-            throw new Exception("incorect username or password"+e);
+            //throw new Exception("incorect username or password"+e);
+            dataContent.put("status","false");
+            dataContent.put("description","incorrect email or password");
+            
+            return dataContent.toString();
         }
         
         
@@ -87,32 +96,30 @@ public class LoginController {
         String roleName = users.getRoleId().getRoleName();
         String name = users.getUserFullname();
         
-        System.out.println("id: "+id);
-        System.out.println("email: "+email);
-        System.out.println("role id: "+roleId);
-        System.out.println("role name: "+roleName);
+//        System.out.println("id: "+id);
+//        System.out.println("email: "+email);
+//        System.out.println("role id: "+roleId);
+//        System.out.println("role name: "+roleName);
+        jsonObject.put("status", "true");
         
-        JSONArray data = new JSONArray();
-        JSONObject role = new JSONObject();
+        dataContent.put("userFullname",name);
+        dataContent.put("userEmail", email);
+        dataContent.put("userId", id);
+        dataContent.put("roleId", roleId);
+        dataContent.put("roleName",roleName);
+        dataContent.put("divisionId", users.getDivisionId().getDivisionId().toString());
+        dataContent.put("divisionName", users.getDivisionId().getDivisionName());
         
-        JSONObject dataContent = new JSONObject();
-        dataContent.put("name",name);
-        dataContent.put("email", email);
-        dataContent.put("id", id);
-        dataContent.put("id_role", roleId);
-        dataContent.put("name_role",roleName);
-        
-        
-        
-        System.out.println("data json: "+dataContent);
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
-        dataContent.put("token", jwt);
+        dataContent.put("userPhoto", users.getUserPhoto());
+        //dataContent.put("status", "true");
+        jsonArray.add(dataContent);
+        jsonObject.put("userToken", jwt);
+        jsonObject.put("data", jsonArray);
+        
         users.setUserToken(jwt);
-        System.out.println("token baru: "+jwt);
         userRepository.save(users);
-//        userRepository.updateToken(jwt, id);
-        //return ResponseEntity.ok(new AuthenticationResponse(jwt));
-        return dataContent.toJSONString();
+        return jsonObject.toJSONString();
     }
     
 }
