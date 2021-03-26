@@ -78,6 +78,8 @@ public class LoginController {
 
         JSONObject dataContent = new JSONObject();
 
+        Users returnActiveUser = new Users();
+
         int returnEmail = userRepository.findIfExistEmail(authenticationRequest.getUsername());
 //        System.out.println(returnEmail);
 
@@ -88,27 +90,36 @@ public class LoginController {
 
             return dataContent.toJSONString();
         } else {
-//            System.out.println("running login controller");
-            try {
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
-                                authenticationRequest.getPassword())
-                );
-            } catch (BadCredentialsException e) {
-                //throw new Exception("incorect username or password"+e);
+            returnActiveUser = userRepository.findByEmail(authenticationRequest.getUsername());
+
+            String userActiveStatus = returnActiveUser.getUserActive();
+
+            if (userActiveStatus.equalsIgnoreCase("false")) {
                 dataContent.put("status", "false");
-                dataContent.put("description", "incorrect password");
+                dataContent.put("description", "your account has been deactivated");
 
-                return dataContent.toString();
+                return dataContent.toJSONString();
+
+            } else {
+                try {
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
+                                    authenticationRequest.getPassword())
+                    );
+                } catch (BadCredentialsException e) {
+                    //throw new Exception("incorect username or password"+e);
+                    dataContent.put("status", "false");
+                    dataContent.put("description", "incorrect password");
+
+                    return dataContent.toString();
+                }
             }
-
         }
 
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
 //        System.out.println("username to insert token: " + userDetails.getUsername());
-
         String uname = userDetails.getUsername();
 
         Users users = new Users();

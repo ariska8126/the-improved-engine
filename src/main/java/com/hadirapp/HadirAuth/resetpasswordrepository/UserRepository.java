@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<Users, String>{
     //IF EXIST EMAIL
     @Query(value = "SELECT IF(EXISTS(SELECT * FROM users WHERE user_email = ?1),1,0)", nativeQuery = true)
     public int findIfExistEmail(@Param("mail") String mail);
+    
+    @Query(value = "SELECT * FROM users WHERE user_email = ?1", nativeQuery = true)
+    public Users findByEmail(@Param("mail") String mail);
 }
