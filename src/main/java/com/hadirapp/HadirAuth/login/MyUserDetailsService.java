@@ -7,6 +7,7 @@ package com.hadirapp.HadirAuth.login;
 
 import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,11 +38,12 @@ public class MyUserDetailsService implements UserDetailsService{
             builder = org.springframework.security.core.userdetails.User.withUsername(userName);
             builder.password(user.getPassword());
             builder.roles(user.getRoles());
-            
-            System.out.println("username after validation: "+user.getUsername());
-            System.out.println("password after validation: "+user.getPassword());
-            System.out.println("roles after validation: "+user.getRoles());
+//            
+//            System.out.println("username after validation: "+user.getUsername());
+//            System.out.println("password after validation: "+user.getPassword());
+//            System.out.println("roles after validation: "+user.getRoles());
         }else{
+            JSONObject jsonObject = new JSONObject();
             System.out.println("user salah");
         }
         
@@ -61,10 +63,10 @@ public class MyUserDetailsService implements UserDetailsService{
             email = us.getUserEmail();
             password = us.getUserPassword();
             role = us.getRoleId().getRoleName();    
-            
-            System.out.println("username: "+userName);
-            System.out.println("password: "+password);
-            System.out.println("role: "+role);
+//            
+//            System.out.println("username: "+userName);
+//            System.out.println("password: "+password);
+//            System.out.println("role: "+role);
             
         }else{
             System.out.println("access denied");

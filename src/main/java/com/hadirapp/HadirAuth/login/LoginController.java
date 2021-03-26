@@ -51,6 +51,9 @@ public class LoginController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    MyUserDetailsService MyUserDetailsService;
+
     @RequestMapping("/checklogin")
     public String hello() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -58,7 +61,7 @@ public class LoginController {
         JSONObject dataContent = new JSONObject();
 
         dataContent.put("status", "true");
-        dataContent.put("description", "login success as "+nameLogin);
+        dataContent.put("description", "login success as " + nameLogin);
         return dataContent.toString();
     }
 
@@ -66,23 +69,37 @@ public class LoginController {
     public String createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
 
         JSONObject dataContent = new JSONObject();
 
-        System.out.println("running login controller");
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
-                            authenticationRequest.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            //throw new Exception("incorect username or password"+e);
-            dataContent.put("status", "false");
-            dataContent.put("description", "incorrect email or password");
+        int returnEmail = userRepository.findIfExistEmail(authenticationRequest.getUsername());
+        System.out.println(returnEmail);
 
-            return dataContent.toString();
+        if (returnEmail == 0) {
+            dataContent.put("status", "false");
+            dataContent.put("description", "incorrect email");
+
+            return dataContent.toJSONString();
+        } else {
+            System.out.println("running login controller");
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
+                                authenticationRequest.getPassword())
+                );
+            } catch (BadCredentialsException e) {
+                //throw new Exception("incorect username or password"+e);
+                dataContent.put("status", "false");
+                dataContent.put("description", "incorrect password");
+
+                return dataContent.toString();
+            }
+
         }
 
         final UserDetails userDetails = userDetailsService
