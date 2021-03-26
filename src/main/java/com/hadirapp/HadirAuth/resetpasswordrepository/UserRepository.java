@@ -19,4 +19,8 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<Users, String>{
     @Query(value = "UPDATE users set users.user_token = :token where user_id = :userId", nativeQuery = true)
     public String updateToken(@Param("token") String token, @Param("userId") String userId);
+    
+    //IF EXIST EMAIL
+    @Query(value = "SELECT IF(EXISTS(SELECT * FROM users WHERE user_email = ?1),1,0)", nativeQuery = true)
+    public int findIfExistEmail(@Param("mail") String mail);
 }

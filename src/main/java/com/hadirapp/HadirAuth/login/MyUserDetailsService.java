@@ -7,6 +7,7 @@ package com.hadirapp.HadirAuth.login;
 
 import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,6 +43,9 @@ public class MyUserDetailsService implements UserDetailsService{
             System.out.println("password after validation: "+user.getPassword());
             System.out.println("roles after validation: "+user.getRoles());
         }else{
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("status", "false");
+            jsonObject.put("description", "incorrect email");
             System.out.println("user salah");
         }
         
