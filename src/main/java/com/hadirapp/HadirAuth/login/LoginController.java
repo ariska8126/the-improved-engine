@@ -9,11 +9,12 @@ import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.jwtfilter.JwtRequestFilter;
 import com.hadirapp.HadirAuth.jwtutil.JwtUtil;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+
 import com.hadirapp.HadirAuth.resetpasswordrepository.UserRepository;
+
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,15 +79,16 @@ public class LoginController {
         JSONObject dataContent = new JSONObject();
 
         int returnEmail = userRepository.findIfExistEmail(authenticationRequest.getUsername());
-        System.out.println(returnEmail);
+//        System.out.println(returnEmail);
 
         if (returnEmail == 0) {
+
             dataContent.put("status", "false");
             dataContent.put("description", "incorrect email");
 
             return dataContent.toJSONString();
         } else {
-            System.out.println("running login controller");
+//            System.out.println("running login controller");
             try {
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
@@ -105,7 +107,7 @@ public class LoginController {
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
-        System.out.println("username to insert token: " + userDetails.getUsername());
+//        System.out.println("username to insert token: " + userDetails.getUsername());
 
         String uname = userDetails.getUsername();
 
@@ -119,10 +121,7 @@ public class LoginController {
         String roleName = users.getRoleId().getRoleName();
         String name = users.getUserFullname();
 
-//        System.out.println("id: "+id);
-//        System.out.println("email: "+email);
-//        System.out.println("role id: "+roleId);
-//        System.out.println("role name: "+roleName);
+//        System.out.println("data json: " + dataContent);
         jsonObject.put("status", "true");
 
         dataContent.put("userFullname", name);
@@ -142,6 +141,8 @@ public class LoginController {
 
         users.setUserToken(jwt);
         userRepository.save(users);
+//        userRepository.updateToken(jwt, id);
+        //return ResponseEntity.ok(new AuthenticationResponse(jwt));
         return jsonObject.toJSONString();
     }
 

@@ -28,7 +28,7 @@ public class MyUserDetailsService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         
-        System.out.println("load by username: "+userName);
+//        System.out.println("load by username: "+userName);
         
         ThisUser user = validasi(userName);
         
@@ -44,14 +44,14 @@ public class MyUserDetailsService implements UserDetailsService{
 //            System.out.println("roles after validation: "+user.getRoles());
         }else{
             JSONObject jsonObject = new JSONObject();
-            System.out.println("user salah");
+//            System.out.println("user salah");
         }
         
         return builder.build();
     }
 
     private ThisUser validasi(String userName) {
-        System.out.println("cek username di databse: "+userName);
+//        System.out.println("cek username di databse: "+userName);
         
         String password = null;
         String role = null;
