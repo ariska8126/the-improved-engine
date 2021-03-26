@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author herli
  */
+@RequestMapping("/api/auth")
 @RestController
 public class LoginController {
 
@@ -49,23 +52,38 @@ public class LoginController {
     @Autowired
     UserRepository userRepository;
 
-    @RequestMapping("/hello")
+    @RequestMapping("/checklogin")
     public String hello() {
-        return "hello world";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String nameLogin = auth.getName();
+        JSONObject dataContent = new JSONObject();
+
+        dataContent.put("status", "true");
+        dataContent.put("description", "login success as "+nameLogin);
+        return dataContent.toString();
     }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+
+        JSONObject dataContent = new JSONObject();
+
         System.out.println("running login controller");
+        
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
                             authenticationRequest.getPassword())
             );
         } catch (BadCredentialsException e) {
-            throw new Exception("incorect username or password" + e);
+            dataContent.put("status", "false");
+            dataContent.put("description", "incorrect email or password");
+
+            return dataContent.toString();
         }
 
         final UserDetails userDetails = userDetailsService
@@ -85,31 +103,29 @@ public class LoginController {
         String roleName = users.getRoleId().getRoleName();
         String name = users.getUserFullname();
 
-        System.out.println("id: " + id);
-        System.out.println("email: " + email);
-        System.out.println("role id: " + roleId);
-        System.out.println("role name: " + roleName);
-
-        JSONArray data = new JSONArray();
-        JSONObject role = new JSONObject();
-
-        JSONObject dataContent = new JSONObject();
-        dataContent.put("name", name);
-        dataContent.put("email", email);
-        dataContent.put("id", id);
-        dataContent.put("id_role", roleId);
-        dataContent.put("name_role", roleName);
-
         System.out.println("data json: " + dataContent);
+        jsonObject.put("status", "true");
+
+        dataContent.put("userFullname", name);
+        dataContent.put("userEmail", email);
+        dataContent.put("userId", id);
+        dataContent.put("roleId", roleId);
+        dataContent.put("roleName", roleName);
+        dataContent.put("divisionId", users.getDivisionId().getDivisionId().toString());
+        dataContent.put("divisionName", users.getDivisionId().getDivisionName());
+
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
-        dataContent.put("token", jwt);
+        dataContent.put("userPhoto", users.getUserPhoto());
+        //dataContent.put("status", "true");
+        jsonArray.add(dataContent);
+        jsonObject.put("userToken", jwt);
+        jsonObject.put("data", jsonArray);
+
         users.setUserToken(jwt);
-        System.out.println("token baru: " + jwt);
         userRepository.save(users);
 //        userRepository.updateToken(jwt, id);
         //return ResponseEntity.ok(new AuthenticationResponse(jwt));
         return dataContent.toJSONString();
-
     }
 
 }
