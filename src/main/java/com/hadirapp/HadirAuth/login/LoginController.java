@@ -9,11 +9,12 @@ import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.jwtfilter.JwtRequestFilter;
 import com.hadirapp.HadirAuth.jwtutil.JwtUtil;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+
 import com.hadirapp.HadirAuth.resetpasswordrepository.UserRepository;
+
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,9 +51,6 @@ public class LoginController {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    MyUserDetailsService MyUserDetailsService;
 
     @RequestMapping("/checklogin")
     public String hello() {
@@ -99,7 +97,6 @@ public class LoginController {
 
                 return dataContent.toString();
             }
-
         }
 
         final UserDetails userDetails = userDetailsService
@@ -119,10 +116,6 @@ public class LoginController {
         String roleName = users.getRoleId().getRoleName();
         String name = users.getUserFullname();
 
-//        System.out.println("id: "+id);
-//        System.out.println("email: "+email);
-//        System.out.println("role id: "+roleId);
-//        System.out.println("role name: "+roleName);
         jsonObject.put("status", "true");
 
         dataContent.put("userFullname", name);
@@ -132,7 +125,7 @@ public class LoginController {
         dataContent.put("roleName", roleName);
         dataContent.put("divisionId", users.getDivisionId().getDivisionId().toString());
         dataContent.put("divisionName", users.getDivisionId().getDivisionName());
-
+      
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
         dataContent.put("userPhoto", users.getUserPhoto());
         //dataContent.put("status", "true");
@@ -141,8 +134,10 @@ public class LoginController {
         jsonObject.put("data", jsonArray);
 
         users.setUserToken(jwt);
+
         userRepository.save(users);
         return jsonObject.toJSONString();
+
     }
 
 }
