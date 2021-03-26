@@ -71,6 +71,9 @@ public class Users implements Serializable {
     @Lob
     @Column(name = "user_photo")
     private String userPhoto;
+    @Lob
+    @Column(name = "user_token")
+    private String userToken;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private List<BootcampDetail> bootcampDetailList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "approvalRequesterId")
@@ -93,8 +96,6 @@ public class Users implements Serializable {
         this.userId = userId;
     }
     
-    //for request reset password 
-
     public Users(String userId, String userFullname, String userEmail, String userPassword, 
             String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto,
             Role roleId, Division divisionId) {
@@ -109,7 +110,6 @@ public class Users implements Serializable {
         this.roleId = roleId;
         this.divisionId = divisionId;
     }
-    
 
     public Users(String userId, String userFullname, String userEmail, String userPassword, String userActive, String userUnixcodeValue, Date userUnixcodeDate, String userPhoto) {
         this.userId = userId;
@@ -184,6 +184,14 @@ public class Users implements Serializable {
 
     public void setUserPhoto(String userPhoto) {
         this.userPhoto = userPhoto;
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
 
     @XmlTransient
