@@ -159,6 +159,7 @@ public class PasswordForgotController {
     }
 
     @PostMapping("/api/auth/resetpassword/savenewpassword")
+    @ApiOperation(value="save new password")
     public String saveNewpassword(@RequestBody Map<String, ?> input) {
         
         System.out.println("save new password running");
