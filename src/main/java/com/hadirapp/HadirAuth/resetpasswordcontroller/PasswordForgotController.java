@@ -10,6 +10,8 @@ import com.hadirapp.HadirAuth.entity.Role;
 import com.hadirapp.HadirAuth.entity.Users;
 import com.hadirapp.HadirAuth.mail.SpringMailServices;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author herli
  */
 @RestController
+@RequestMapping("/api/auth")
+@Api(tags="Forgot Password")
 public class PasswordForgotController {
 
     @Autowired
@@ -36,7 +40,8 @@ public class PasswordForgotController {
     @Autowired
     private SpringMailServices serviceMail;
 
-    @PostMapping("/api/auth/resetpassword/request")
+    @PostMapping("/resetpassword/request")
+    @ApiOperation(value="reqeust forgot password by email")
     public String test(@RequestBody Map<String, ?> input) {
 
 //        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
@@ -107,7 +112,8 @@ public class PasswordForgotController {
 
     }
 
-    @RequestMapping(value = "/api/auth/resetpassword/request/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/resetpassword/request/{id}", method = RequestMethod.GET)
+    @ApiOperation(value="validate uuid")
     public String verifyUUID(@PathVariable("id") String id) {
 
         System.out.println("UUID: " + id);

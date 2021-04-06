@@ -12,6 +12,8 @@ import com.hadirapp.HadirAuth.repository.BootcampRepository;
 import com.hadirapp.HadirAuth.resetpasswordimplement.PasswordResetServiceImplement;
 
 import com.hadirapp.HadirAuth.resetpasswordrepository.UserRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/api/auth")
 @RestController
+@Api(tags = "Hadir Authentication")
 public class LoginController {
 
     @Autowired
@@ -52,7 +55,7 @@ public class LoginController {
 
     @Autowired
     UserRepository userRepository;
-    
+
     @Autowired
     private BootcampRepository bootcampRepository;
 
@@ -60,6 +63,7 @@ public class LoginController {
     MyUserDetailsService MyUserDetailsService;
 
     @RequestMapping("/checklogin")
+    @ApiOperation(value = "check Login")
     public String hello() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String nameLogin = auth.getName();
@@ -71,6 +75,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @ApiOperation(value = "login email & password")
     public String createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
@@ -83,32 +88,32 @@ public class LoginController {
         JSONObject dataContent = new JSONObject();
 
         Users returnActiveUser = new Users();
-        
-        System.out.println("input username: "+authenticationRequest.getUsername());
-        System.out.println("input password: "+authenticationRequest.getPassword());
+
+        System.out.println("input username: " + authenticationRequest.getUsername());
+        System.out.println("input password: " + authenticationRequest.getPassword());
 
         int returnEmail = userRepository.findIfExistEmail(authenticationRequest.getUsername());
 //        System.out.println(returnEmail);
 
-        System.out.println("cek if exist email: "+returnEmail);
+        System.out.println("cek if exist email: " + returnEmail);
         if (returnEmail == 0) {
 
             dataContent.put("status", "false");
             dataContent.put("description", "incorrect email");
 
-            System.out.println("return: "+dataContent);
+            System.out.println("return: " + dataContent);
             return dataContent.toJSONString();
         } else {
             returnActiveUser = userRepository.findByEmail(authenticationRequest.getUsername());
 
             String userActiveStatus = returnActiveUser.getUserActive();
-            System.out.println("cek user active status: "+userActiveStatus);
-            
+            System.out.println("cek user active status: " + userActiveStatus);
+
             if (userActiveStatus.equalsIgnoreCase("false")) {
                 dataContent.put("status", "false");
                 dataContent.put("description", "your account has been deactivated");
 
-                System.out.println("return: "+dataContent);
+                System.out.println("return: " + dataContent);
                 return dataContent.toJSONString();
 
             } else {
@@ -122,7 +127,7 @@ public class LoginController {
                     dataContent.put("status", "false");
                     dataContent.put("description", "incorrect password");
 
-                    System.out.println("return: "+dataContent);
+                    System.out.println("return: " + dataContent);
                     return dataContent.toString();
                 }
             }
@@ -131,7 +136,7 @@ public class LoginController {
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
-//        System.out.println("username to insert token: " + userDetails.getUsername());
+        System.out.println("username to insert token: " + userDetails.getUsername());
         String uname = userDetails.getUsername();
 
         Users users = new Users();
@@ -140,22 +145,22 @@ public class LoginController {
 
         String id = users.getUserId();
         String email = users.getUserEmail();
-        
+
         int roleId = users.getRoleId().getRoleId();
         String roleName = users.getRoleId().getRoleName();
-        
+
         String name = users.getUserFullname();
 
         String bootcampId = bootcampRepository.getBootcampId(id);
         String bootcampName = bootcampRepository.getBootcampName(id);
-        
-        System.out.println("role: "+roleName);
-        if(roleId == 5){
+
+        System.out.println("role: " + roleName);
+        if (roleId == 5) {
             dataContent.put("bootcampId", bootcampId);
             dataContent.put("bootcampName", bootcampName);
         }
-        
-//        System.out.println("data json: " + dataContent);
+
+        System.out.println("data json: " + dataContent);
         jsonObject.put("status", "true");
 
         dataContent.put("userFullname", name);
@@ -168,7 +173,7 @@ public class LoginController {
 
         final String jwt = jwtTokenUtil.generateToken(userDetails, dataContent);
         dataContent.put("userPhoto", users.getUserPhoto());
-        //dataContent.put("status", "true");
+//        dataContent.put("status", "true");
         jsonArray.add(dataContent);
         jsonObject.put("userToken", jwt);
         jsonObject.put("data", jsonArray);
@@ -177,15 +182,14 @@ public class LoginController {
         userRepository.save(users);
 //        userRepository.updateToken(jwt, id);
         //return ResponseEntity.ok(new AuthenticationResponse(jwt));
-        System.out.println("return: "+jsonObject);
+        System.out.println("return: " + jsonObject);
         return jsonObject.toJSONString();
     }
-    
+
     @RequestMapping(value = "/loginmobile", method = RequestMethod.POST)
+    @ApiOperation(value = "Mobil Login")
     public String createAuthenticationTokenMobile(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
-    
-        
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
@@ -196,32 +200,32 @@ public class LoginController {
         JSONObject dataContent = new JSONObject();
 
         Users returnActiveUser = new Users();
-        
-        System.out.println("input username: "+authenticationRequest.getUsername());
-        System.out.println("input password: "+authenticationRequest.getPassword());
+
+        System.out.println("input username: " + authenticationRequest.getUsername());
+        System.out.println("input password: " + authenticationRequest.getPassword());
 
         int returnEmail = userRepository.findIfExistEmail(authenticationRequest.getUsername());
 //        System.out.println(returnEmail);
 
-        System.out.println("cek if exist email: "+returnEmail);
+        System.out.println("cek if exist email: " + returnEmail);
         if (returnEmail == 0) {
 
             dataContent.put("status", "false");
             dataContent.put("description", "incorrect email");
 
-            System.out.println("return: "+dataContent);
+            System.out.println("return: " + dataContent);
             return dataContent.toJSONString();
         } else {
             returnActiveUser = userRepository.findByEmail(authenticationRequest.getUsername());
 
             String userActiveStatus = returnActiveUser.getUserActive();
-            System.out.println("cek user active status: "+userActiveStatus);
-            
+            System.out.println("cek user active status: " + userActiveStatus);
+
             if (userActiveStatus.equalsIgnoreCase("false")) {
                 dataContent.put("status", "false");
                 dataContent.put("description", "your account has been deactivated");
 
-                System.out.println("return: "+dataContent);
+                System.out.println("return: " + dataContent);
                 return dataContent.toJSONString();
 
             } else {
@@ -235,7 +239,7 @@ public class LoginController {
                     dataContent.put("status", "false");
                     dataContent.put("description", "incorrect password");
 
-                    System.out.println("return: "+dataContent);
+                    System.out.println("return: " + dataContent);
                     return dataContent.toString();
                 }
             }
@@ -253,21 +257,21 @@ public class LoginController {
 
         String id = users.getUserId();
         String email = users.getUserEmail();
-        
+
         int roleId = users.getRoleId().getRoleId();
         String roleName = users.getRoleId().getRoleName();
-        
+
         String name = users.getUserFullname();
 
         String bootcampId = bootcampRepository.getBootcampId(id);
         String bootcampName = bootcampRepository.getBootcampName(id);
-        
-        System.out.println("role: "+roleName);
-        if(roleId == 5){
+
+        System.out.println("role: " + roleName);
+        if (roleId == 5) {
             dataContent.put("bootcampId", bootcampId);
             dataContent.put("bootcampName", bootcampName);
         }
-        
+
 //        System.out.println("data json: " + dataContent);
         dataContent.put("status", "true");
 
@@ -290,9 +294,9 @@ public class LoginController {
         userRepository.save(users);
 //        userRepository.updateToken(jwt, id);
         //return ResponseEntity.ok(new AuthenticationResponse(jwt));
-        System.out.println("return: "+jsonObject);
+        System.out.println("return: " + jsonObject);
         return dataContent.toJSONString();
-    
+
     }
 
 }
