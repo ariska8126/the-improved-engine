@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/auth")
-@Api(tags="Forgot Password")
+@Api(tags = "Forgot Password")
 public class PasswordForgotController {
 
     @Autowired
@@ -41,13 +43,15 @@ public class PasswordForgotController {
     private SpringMailServices serviceMail;
 
     @PostMapping("/resetpassword/request")
-    @ApiOperation(value="reqeust forgot password by email")
+    @ApiOperation(value = "reqeust forgot password by email")
     public String test(@RequestBody Map<String, ?> input) {
 
+        JSONObject jSONObject = new JSONObject();
 //        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
         System.out.println("reset password running");
 
         String id = (String) input.get("id");
+        String baseUrl = (String) input.get("baseUrl");
         System.out.println("validasi username running");
         System.out.println("username: " + id);
 
@@ -55,7 +59,10 @@ public class PasswordForgotController {
         System.out.println("exists reply: " + exists);
 
         if (exists == 0) {
-            return "email tidak di temukan";
+            jSONObject.put("status", "false");
+            jSONObject.put("description", "email not found");
+
+            return jSONObject.toJSONString();
         } else {
             Users user = new Users();
             user = prsi.findByEmail(id);
@@ -96,7 +103,7 @@ public class PasswordForgotController {
             //mail
             String tt = "Password Reset";
             String content = "Use code: " + uuid6 + ", or click on button bellow";
-            String link = "http://localhost:8082/api/auth/resetpassword/request/" + userUnixcodeValue;
+            String link = baseUrl + "/" + userUnixcodeValue;
 
             System.out.println("send mail running");
 
@@ -107,13 +114,16 @@ public class PasswordForgotController {
             model.put("tiketID", link);
 
             serviceMail.sendMail(model, tt, userEmail);
-            return "success";
+            jSONObject.put("status", "true");
+            jSONObject.put("description", "check your email");
+
+            return jSONObject.toJSONString();
         }
 
     }
 
     @RequestMapping(value = "/resetpassword/request/{id}", method = RequestMethod.GET)
-    @ApiOperation(value="validate uuid")
+    @ApiOperation(value = "validate uuid")
     public String verifyUUID(@PathVariable("id") String id) {
 
         System.out.println("UUID: " + id);
@@ -132,62 +142,92 @@ public class PasswordForgotController {
             System.out.println("expired uuid date: " + expiredUuid);
             Date now = new Date();
             System.out.println("now: " + now);
-            
+
             long difference_in_time = now.getTime() - expiredUuid.getTime();
             long difference_in_minutes = TimeUnit.MILLISECONDS.toMinutes(difference_in_time);
-            System.out.println("seleisih waktu: "+difference_in_minutes);
-            
-            if(difference_in_minutes > 30){
+            System.out.println("seleisih waktu: " + difference_in_minutes);
+
+            if (difference_in_minutes > 30) {
                 System.out.println("uuid expired");
                 return "uuid expired";
-            } else{
+            } else {
                 System.out.println("uuid availabe");
                 return "uuid available to change password";
             }
-            
-//            if (now.compareTo(expiredUuid) > 0) {
-//                System.out.println("now lebih besar");
-//                System.out.println("uuid expired");
-//                return "uuid expired";
-//            } else {
-//                System.out.println("uuid available to change password");
-//            }
 
         }
 
-//        return "succes";
     }
 
-    @PostMapping("/api/auth/resetpassword/savenewpassword")
-    @ApiOperation(value="save new password")
+    @PostMapping("/resetpassword/savenewpassword")
+    @ApiOperation(value = "save new password")
     public String saveNewpassword(@RequestBody Map<String, ?> input) {
-        
-        System.out.println("save new password running");
         String uuid = (String) input.get("uuid");
         String password = (String) input.get("password");
 
+        JSONObject jSONObject = new JSONObject();
+        //check uuid
+        int cekUUID = prsi.findUIID(uuid);
+        System.out.println("uuid check: " + cekUUID);
+
+        if (cekUUID < 1) {
+            System.out.println("uuid not found");
+            jSONObject.put("status", "false");
+            jSONObject.put("description", "uid not found");
+
+            return jSONObject.toJSONString();
+
+        }
+
+        System.out.println("uuid ditemukan");
         Users user = prsi.findByUIID(uuid);
+        System.out.println("user: " + user.getUserEmail());
+        Date expiredUuid = user.getUserUnixcodeDate();
+        System.out.println("expired uuid date: " + expiredUuid);
+        Date now = new Date();
+        System.out.println("now: " + now);
+
+        long difference_in_time = now.getTime() - expiredUuid.getTime();
+        long difference_in_minutes = TimeUnit.MILLISECONDS.toMinutes(difference_in_time);
+        System.out.println("seleisih waktu: " + difference_in_minutes);
+
+        if (difference_in_minutes > 30) {
+            System.out.println("uuid expired");
+            jSONObject.put("status", "false");
+            jSONObject.put("description", "uid expired");
+
+            return jSONObject.toJSONString();
+        }
+
+        //save new password
+        System.out.println("save new password running");
+        
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
         String userId = user.getUserId(); //for safe update
         String userFullname = user.getUserFullname(); //for safe update
         String userEmail = user.getUserEmail(); //for safe update
-        String userPassword = password; //update password
+        String userPassword = encoder.encode(password); //update password
         String userActive = user.getUserActive(); //for safe update
         String userUnixcodeValue = uuid; // for safe update
         Date userUnixcodeDate = user.getUserUnixcodeDate(); // for safe update
         String userPhoto = user.getUserPhoto(); //for safe update
         int roleID = user.getRoleId().getRoleId(); //for safe update
         int divisionId = user.getDivisionId().getDivisionId(); //for safe update
-        
+
         Users updatepassword = new Users(userId, userFullname, userEmail,
-                    userPassword, userActive, userUnixcodeValue,
-                    userUnixcodeDate, userPhoto, new Role(roleID),
-                    new Division(divisionId));
+                userPassword, userActive, userUnixcodeValue,
+                userUnixcodeDate, userPhoto, new Role(roleID),
+                new Division(divisionId));
 
-            prsi.save(updatepassword);
+        prsi.save(updatepassword);
 
-            System.out.println("save new password berhasil");
-        return "save done";
+        System.out.println("save new password berhasil");
+        System.out.println("uuid expired");
+        jSONObject.put("status", "true");
+        jSONObject.put("description", "update success");
+
+        return jSONObject.toJSONString();
     }
 
 }
